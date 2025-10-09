@@ -1,0 +1,11 @@
+- name: Configure Nginx reverse proxy
+  hosts: reverse-proxy
+  become: yes
+  roles:
+    - nginx
+
+- name: Configure Django backend server
+  hosts: backend
+  become: yes
+  roles:
+    - backend

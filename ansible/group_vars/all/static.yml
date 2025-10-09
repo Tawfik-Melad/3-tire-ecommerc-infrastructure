@@ -1,0 +1,4 @@
+# ansible/group_vars/all/static.yml
+DJANGO_SECRET_KEY: "django-insecure-@ma1#9f1q8^l1mf=xkf%y6%^fpo_w!&5^!5l5g%j)k^ed1o8g3"
+DJANGO_DEBUG: true
+DJANGO_ALLOWED_HOSTS: "*"

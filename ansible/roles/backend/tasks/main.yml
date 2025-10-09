@@ -1,0 +1,76 @@
+---
+- name: Update apt cache
+  apt:
+    update_cache: yes
+
+- name: Install dependencies
+  apt:
+    name:
+      - apt-transport-https
+      - ca-certificates
+      - curl
+      - software-properties-common
+    state: present
+
+- name: Add Docker GPG key
+  shell: |
+    curl -fsSL https://download.docker.com/linux/ubuntu/gpg | sudo apt-key add -
+
+- name: Add Docker repository
+  shell: |
+    add-apt-repository \
+      "deb [arch=amd64] https://download.docker.com/linux/ubuntu \
+      $(lsb_release -cs) stable"
+
+- name: Install Docker
+  apt:
+    name: docker-ce
+    state: present
+    update_cache: yes
+
+- name: Ensure Docker service is running
+  service:
+    name: docker
+    state: started
+    enabled: yes
+
+- name: Create app directory
+  file:
+    path: /opt/django-app
+    state: directory
+
+- name: Create .env file from template
+  template:
+    src: env.j2
+    dest: /opt/django-app/.env
+    mode: '0600'
+
+- name: Pull Django image
+  community.docker.docker_image:
+    name: "tawfikdocker/django-backend:latest"
+    source: pull
+    force_source: yes
+
+- name: Run Django container
+  community.docker.docker_container:
+    name: django-backend
+    image: "tawfikdocker/django-backend:latest"
+    env_file: /opt/django-app/.env
+    restart_policy: always
+    published_ports:
+      - "8000:8000"
+      
+- name: Copy static files from container to host
+  command: docker cp django-backend:/app/staticfiles /opt/django-app/staticfiles
+  args:
+    creates: /opt/django-app/staticfiles
+
+- name: Install AWS CLI
+  apt:
+    name: awscli
+    state: present
+    update_cache: yes
+
+
+- name: Upload static files to S3 bucket
+  command: aws s3 sync /opt/django-app/staticfiles s3://{{ s3_bucket_name }}

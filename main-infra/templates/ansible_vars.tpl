@@ -1,0 +1,8 @@
+s3_bucket_name: "${s3_bucket_name}"
+s3_bucket_url: "${s3_bucket_url}"
+db_endpoint: "${db_endpoint}"
+backend_private_ip: "${backend_private_ip}"
+reverse_proxy_public_ip: "${reverse_proxy_public_ip}"
+db_username: "${db_username}"
+db_password: "${db_password}"
+db_name: "${db_name}"
